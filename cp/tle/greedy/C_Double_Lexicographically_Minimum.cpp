@@ -1,9 +1,10 @@
-// Problem Link:
+// Problem Link: https://codeforces.com/problemset/problem/1675/E
 
 #include <iostream>
 #include <bits/stdc++.h>
 #define pb push_back
 // #define int long long
+#include <map>
 #define rep(i,a,b) for(int i=a;i<b;i++)
 using namespace std;
 
@@ -113,6 +114,145 @@ void solve() {
 
     cout<<t<<"\n";
 }
+
+void solve1() {
+    string s;
+    cin >> s;
+    int n = s.size();
+
+    
+    map<char, int> freq;
+    for (char c : s) freq[c]++;
+
+    string t(n, '.');
+    int left = 0, right = n - 1;
+    int midPtr = n / 2; // start of second half
+
+    while (left <= right && !freq.empty()) {
+        // Pick up to 3 characters (count-based, not distinct)
+        vector<char> picks;
+        for (auto &p : freq) {
+            for (int i = 0; i < p.second && picks.size() < 3; i++)
+                picks.push_back(p.first);
+            if (picks.size() >= 3) break;
+        }
+
+        if (picks.size() == 3) {
+            char x = picks[0], y = picks[1], z = picks[2];
+
+            if (x == y) {
+                t[left++] = y;
+                t[right--] = x;
+                freq[x] -= 2; // two of same used
+            }
+            else if (x != y && y == z) {
+                t[left++] = y;
+                t[right--] = z;
+                freq[y]--; freq[z]--;
+                if (n % 2 == 1)
+                    t[n / 2] = x;
+                else
+                    t[midPtr++] = x;
+                freq[x]--;
+            }
+            else if (x != y && y != z) {
+                t[left++] = y;
+                t[right--] = x;
+                freq[x]--; freq[y]--;
+            }
+        } 
+        else if (picks.size() == 2) {
+            char x = picks[0], y = picks[1];
+            // smaller -> end, larger -> start
+            if (x < y) {
+                t[left++] = y;
+                t[right--] = x;
+            } else {
+                t[left++] = x;
+                t[right--] = y;
+            }
+            freq[x]--; freq[y]--;
+        } 
+        else if (picks.size() == 1) {
+            char x = picks[0];
+            t[left] = x;
+            freq[x]--;
+            left++;
+        }
+
+        // Clean up empty keys
+        vector<char> toErase;
+        for (auto &p : freq)
+            if (p.second <= 0)
+                toErase.push_back(p.first);
+        for (char c : toErase)
+            freq.erase(c);
+    }
+
+    cout<< t << endl;
+
+}
+
+void solve2() {
+    string s;
+    cin >> s;
+    int n = s.size();
+
+    sort(s.begin(), s.end()); 
+
+    string t(n, '.');
+
+    int left  = 0;
+    int right = n - 1;
+
+    for(int i = 0; i < n; i++) {
+        char x = s[i];
+        char y = s[i + 1];
+
+        // cout<<"x: "<<x<<", y: "<<y<<"\n";
+
+        if(i == n - 1) {
+            t[left] = x;
+            left++;
+            break;
+        }
+
+        if(x == y) {
+            t[left] = x;
+            t[right] = x;
+            left++;
+            right--;
+            i++;
+        } else {
+            if(y == s[n - 1]) {
+                // form a palindrome-like segment from left to right
+                rep(j, left, right + 1) {
+                    if(j == n / 2)
+                        t[j] = x;
+                    else
+                        t[j] = y;
+                }
+                // cout<<"here\n";
+                break;
+            } else {
+                t[right] = x;
+                t[left] = y;
+                left++;
+                right--;
+                int k = i + 2;
+                while(left <= right && k < n) {
+                    t[left] = s[k];
+                    left++;
+                    k++;
+                }
+                // cout<<"here again\n";
+                break;
+            }
+        }
+    }
+
+    cout<<t<<"\n";
+}
  
 signed main()
 {
@@ -121,6 +261,6 @@ signed main()
     cin.exceptions(cin.failbit);
     int T; cin>>T;
     while(T--){
-        solve_();
+        solve2();
     }
 }
