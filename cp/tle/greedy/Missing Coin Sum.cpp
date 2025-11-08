@@ -20,6 +20,15 @@ void solve() {
     int minCoinSum = 0;
     int maxCoinSum = 0;
 
+    // In a brute force approach we would have to ensure picking/ not picking an ele at each turn and keep track of the 
+    // possible sums formed.
+    // Keeping a range allows us to do this greedily. We will keep a range of min sum and max sum possible.
+    // When we pick an element then each possible sum can be turned into sum + i.
+    // So, all the sums in the range of [minSum, maxSum] can be turned into [newMinSum, newMaxSum] = [minSum + i, maxSum +i].
+    // Crux in this question is that if the [newMinSum, newMaxSum] overlaps with [minSum, maxSum]
+    // OR, newMinCoinSum <= maxSum + 1. then the possible range turns into [minSum, newMaxSum],
+    // since, this is the new possible range.
+
     rep(i, 0, n) {
         int newMinCoinSum = minCoinSum + v[i];
         int newMaxCoinSum = maxCoinSum + v[i];
